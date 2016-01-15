@@ -100,6 +100,7 @@
 		テキストデータ：&
 		テキストデータ：camp=2025
 	要素終了:MoreSearchResultsUrl
+	
 	要素開始:Item, 
 		要素開始:ASIN, テキストデータ：B013D1W2X0	要素終了:ASIN
 		要素開始:DetailPageURL, テキストデータ：http://www.amazon.co.jp/%E3%83%93%E3%83%AB%E3%83%80%E3%83%BC%E3%82%BA%E3%83%91%E3%83%BC%E3%83%84HD-144-MS%E3%83%8F%E3%83%B3%E3%83%8902-%E3%82%B8%E3%82%AA%E3%83%B3%E7%B3%BB-%E3%83%80%E3%83%BC%E3%82%AF%E3%82%B0%E3%83%AC%E3%83%BC/dp/B013D1W2X0%3FSubscriptionId%3DAKIAIOQBYSAXCCXSV4ZQ%26tag%3Dprolinesystem-22%26linkCode%3Dxm2%26camp%3D2025%26creative%3D165953%26creativeASIN%3DB013D1W2X0		要素終了:DetailPageURL

@@ -19,14 +19,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 public class AmazonIDSearch {
 
-	public static void main(String[] args) {
-
-		List<String> categoryList = new ArrayList<>();
-		categoryList.add("ガンダム プラモデル");
-		new AmazonIDSearch().process(100, 15000, 100, categoryList);
-	}
-
-	public void process(int initialPrice, int maxPrice, int tick, List<String> categoryList) {
+	public List<Item> getInfo(int initialPrice, int maxPrice, int tick, String ymd, List<String> categoryList) {
 
 		List<Item> itemList = new ArrayList<>();
 
@@ -35,7 +28,7 @@ public class AmazonIDSearch {
 		for (String category : categoryList) {
 			for (int price = initialPrice; price <= maxPrice; price += tick) {
 				try {
-					AmazonItemSearchSax sax = new AmazonItemSearchSax();
+					AmazonItemSearchSax sax = new AmazonItemSearchSax(category);
 					try {
 						totalResults = getNumberOfItem(sax, price, tick, category);
 					} catch (Exception e) {
@@ -66,7 +59,7 @@ public class AmazonIDSearch {
 						totalPages = totalResults / 10 + 1;
 					sax.clear();
 					System.out
-							.println("price:" + price + " TotalPages:" + totalPages + " TotalResults:" + totalResults);
+							.println("category:" + category + " price:" + price + " TotalPages:" + totalPages + " TotalResults:" + totalResults);
 					for (int i = 1; i <= totalPages; i++) {
 						try {
 							search(sax, i, price, category);
@@ -90,79 +83,17 @@ public class AmazonIDSearch {
 						sax.clear();
 						System.out.print("Page:" + i + ":" + price + ":" + itemList.size() + "    ");
 					}
-					System.out.println();
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
 			System.out.println("Total Item Lists:" + itemList.size());
-
-			saveItemList(itemList, category);
 		}
 		// for (Item item : itemList) {
 		// System.out.println(item);
 		// }
-	}
-
-	private void saveItemList(List<Item> itemList, String category) {
-
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		PreparedStatement pstmt2 = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			con = DriverManager.getConnection("jdbc:sqlite:plafan.db");
-
-			String sql = "DELETE FROM ITEM where category = ?";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, category);
-			pstmt.executeUpdate();
-			pstmt.close();
-			sql = "DELETE FROM ITEMLINK where category = ?";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, category);
-			pstmt.executeUpdate();
-			pstmt.close();
-
-			sql = "INSERT INTO ITEM (ID, ASIN, TITLE, DetailPageURL, category) VALUES(?, ?, ?, ?, ?);";
-			pstmt = con.prepareStatement(sql);
-
-			String sql2 = "INSERT INTO ITEMLINK (ID, DESCRIPTION, URL, ItemID) VALUES(?, ?, ?, ?);";
-			pstmt2 = con.prepareStatement(sql2);
-
-			int itemSeq = 1;
-			int itemLinkSeq = 1;
-			for (Item item : itemList) {
-				pstmt.setInt(1, itemSeq);
-				pstmt.setString(2, item.getAsin());
-				pstmt.setString(3, item.getTitle());
-				pstmt.setString(4, item.getDetailPageURL());
-				pstmt.executeUpdate();
-
-				for (ItemLink link : item.getItemlinkList()) {
-					pstmt2.setInt(1, itemLinkSeq++);
-					pstmt2.setString(2, link.getDescription());
-					pstmt2.setString(3, link.getUrl());
-					pstmt2.setInt(4, itemSeq);
-					pstmt2.executeUpdate();
-				}
-				itemSeq++;
-			}
-		} catch (
-
-		Exception e) {
-			e.printStackTrace();
-		} finally
-
-		{
-			try {
-				pstmt.close();
-				con.close();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-
+		
+		return itemList;
 	}
 
 	private static int getNumberOfItem(AmazonItemSearchSax sax, int price, int tick, String category) {
@@ -299,7 +230,6 @@ public class AmazonIDSearch {
 				sax.clear();
 			}
 		}
-		System.out.println("Total Item Lists:" + itemList.size());
 	}
 
 	private static void getOffers(AmazonItemOffersSax sax, String asin) {
@@ -325,7 +255,7 @@ public class AmazonIDSearch {
 			keyMap.put("Keywords", asin);
 			keyMap.put("AssociateTag", "prolinesystem-22");
 			keyMap.put("ResponseGroup", "Large");
-			
+
 			SignedRequestsHelper signedRequestsHelper = new SignedRequestsHelper();
 			String urlStr = signedRequestsHelper.sign(keyMap);
 			URL url = new URL(urlStr);
