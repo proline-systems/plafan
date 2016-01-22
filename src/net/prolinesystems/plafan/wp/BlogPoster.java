@@ -1,4 +1,4 @@
-package sample01;
+package net.prolinesystems.plafan.wp;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;

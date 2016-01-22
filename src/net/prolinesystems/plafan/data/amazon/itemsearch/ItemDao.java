@@ -172,7 +172,7 @@ public class ItemDao {
 		return itemList;
 	}
 
-	public List<Item> loadItemByPercentageSaved(int percentage) {
+	public List<Item> loadItemByPercentageSaved(int percentage, int ymd10) {
 
 		List<Item> itemList = new ArrayList<>();
 
@@ -183,9 +183,10 @@ public class ItemDao {
 			Class.forName("org.sqlite.JDBC");
 			con = DriverManager.getConnection("jdbc:sqlite:plafan.db");
 
-			String sql = "SELECT _id, category, ASIN, TITLE, SALES_RANK, SmallImageURL, MediumImageURL, LargeImageURL, ean, ListPrice, ReleaseDate, Condition, OfferPrice, PercentageSaved, Availability, DetailPageURL, YMD FROM ITEM WHERE PercentageSaved > ? order by _id";
+			String sql = "SELECT _id, category, ASIN, TITLE, SALES_RANK, SmallImageURL, MediumImageURL, LargeImageURL, ean, ListPrice, ReleaseDate, Condition, OfferPrice, PercentageSaved, Availability, DetailPageURL, create_ymd10, update_ymd10 FROM ITEM WHERE PercentageSaved >= ? and create_ymd10=? order by _id";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setInt(1, percentage);
+			pstmt.setInt(2, ymd10);
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
 				Item item = new Item();
@@ -214,9 +215,12 @@ public class ItemDao {
 			throw new RuntimeException(e);
 		} finally {
 			try {
-				rs.close();
-				pstmt.close();
-				con.close();
+				if (rs != null)
+					rs.close();
+				if (pstmt != null)
+					pstmt.close();
+				if (con != null)
+					con.close();
 
 			} catch (Exception e) {
 				throw new RuntimeException(e);

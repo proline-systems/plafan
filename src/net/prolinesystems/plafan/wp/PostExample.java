@@ -1,4 +1,4 @@
-package sample01;
+package net.prolinesystems.plafan.wp;
 
 import java.io.IOException;
 import java.net.URL;
@@ -6,7 +6,7 @@ import java.net.URL;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
-import sample01.BlogPoster.PostType;
+import net.prolinesystems.plafan.wp.BlogPoster.PostType;
 
 public class PostExample {
 

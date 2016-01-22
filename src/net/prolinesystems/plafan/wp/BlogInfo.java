@@ -1,4 +1,4 @@
-package sample01;
+package net.prolinesystems.plafan.wp;
 
 public class BlogInfo {
 	private String apiKey;

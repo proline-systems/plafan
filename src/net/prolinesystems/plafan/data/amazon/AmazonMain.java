@@ -2,12 +2,14 @@ package net.prolinesystems.plafan.data.amazon;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import net.prolinesystems.plafan.data.amazon.itemsearch.AmazonIDSearch;
 import net.prolinesystems.plafan.data.amazon.itemsearch.Item;
 import net.prolinesystems.plafan.data.amazon.itemsearch.ItemDao;
+import net.prolinesystems.plafan.data.amazon.itemsearch.SearchInfo;
 import net.prolinesystems.plafan.data.amazon.itemsearch.SearchInfoDao;
 
 public class AmazonMain {
@@ -22,16 +24,21 @@ public class AmazonMain {
 		categoryList.add("青島 プラモデル");
 
 		AmazonIDSearch search = new AmazonIDSearch();
-		List<Item> newItemList = search.getInfo(1100, 1100, 100, strYMD, categoryList);
+		List<Item> newItemList = search.getInfo(100, 11000, 100, strYMD, categoryList);
 
 		SearchInfoDao dao = new SearchInfoDao();
-		Integer lastYmd10 = dao.getLastYmd10();
+		SearchInfo searchInfo = dao.getLast();
+		Integer lastYmd10 = searchInfo.getYmd10();
 		int ymd10 = getCurrentYmd10(lastYmd10);
 		System.out.println("ymd:"+ymd10);
 
 		ItemDao itemDao = new ItemDao();
 		List<Item> itemList = itemDao.load();
 
+		SearchInfo newInfo = new SearchInfo();
+		newInfo.setYmd10(ymd10);
+		newInfo.setSearchDate(new GregorianCalendar());
+		dao.save(newInfo);
 		for (Item newItem : newItemList) {
 			newItem.setCreateYMD10(ymd10);
 			newItem.setUpdateYMD10(ymd10);
